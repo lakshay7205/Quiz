@@ -5,10 +5,6 @@ import com.example.quiz.domain.model.Question
 import com.example.quiz.domain.repository.QuizRepository
 import javax.inject.Inject
 
-/**
- * Use Case to fetch quiz questions from the repository.
- * Follows the Single Responsibility Principle.
- */
 class GetQuestionsUseCase @Inject constructor(
     private val repository: QuizRepository
 ) {

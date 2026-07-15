@@ -14,20 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.max
-data class QuizUiState(
-    val isLoading: Boolean = true,
-    val questions: List<Question> = emptyList(),
-    val currentQuestionIndex: Int = 0,
-    val selectedOptionIndex: Int? = null,
-    val showAnswer: Boolean = false,
-    val error: String? = null,
-    val isQuizFinished: Boolean = false,
-    val streakCount: Int = 0,
-    val correctCount: Int = 0,
-    val skippedCount: Int = 0,
-    val bestStreak: Int = 0
-)
-
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val getQuestionsUseCase: GetQuestionsUseCase
