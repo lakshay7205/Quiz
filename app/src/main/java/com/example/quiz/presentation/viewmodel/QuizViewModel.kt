@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+import kotlin.math.max
 data class QuizUiState(
     val isLoading: Boolean = true,
     val questions: List<Question> = emptyList(),
@@ -22,7 +22,10 @@ data class QuizUiState(
     val showAnswer: Boolean = false,
     val error: String? = null,
     val isQuizFinished: Boolean = false,
-    val streakCount: Int = 0
+    val streakCount: Int = 0,
+    val correctCount: Int = 0,
+    val skippedCount: Int = 0,
+    val bestStreak: Int = 0
 )
 
 @HiltViewModel
@@ -32,6 +35,8 @@ class QuizViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(QuizUiState())
     val uiState: StateFlow<QuizUiState> = _uiState.asStateFlow()
+
+    private var isTransitioning = false
 
     init {
         loadQuestions()
@@ -57,27 +62,33 @@ class QuizViewModel @Inject constructor(
     }
 
     fun onOptionSelected(index: Int) {
-        if (_uiState.value.showAnswer) return
+        if (_uiState.value.showAnswer || isTransitioning) return
 
         val currentQuestion = _uiState.value.questions.getOrNull(_uiState.value.currentQuestionIndex)
         val isCorrect = index == currentQuestion?.correctOptionIndex
 
-        _uiState.update {
-            it.copy(
+        _uiState.update { state ->
+            val newStreak = if (isCorrect) state.streakCount + 1 else 0
+            state.copy(
                 selectedOptionIndex = index,
                 showAnswer = true,
-                streakCount = if (isCorrect) it.streakCount + 1 else 0
+                correctCount = if (isCorrect) state.correctCount + 1 else state.correctCount,
+                streakCount = newStreak,
+                bestStreak = max(state.bestStreak, newStreak)
             )
         }
 
         viewModelScope.launch {
+            isTransitioning = true
             delay(2000)
             moveToNextQuestion()
+            isTransitioning = false
         }
     }
 
     fun onSkip() {
-        _uiState.update { it.copy(streakCount = 0) }
+        if (isTransitioning || _uiState.value.showAnswer) return
+        _uiState.update { it.copy(skippedCount = it.skippedCount + 1, streakCount = 0) }
         moveToNextQuestion()
     }
 
@@ -93,6 +104,21 @@ class QuizViewModel @Inject constructor(
             } else {
                 state.copy(isQuizFinished = true)
             }
+        }
+    }
+
+    fun restartQuiz() {
+        _uiState.update { state ->
+            state.copy(
+                currentQuestionIndex = 0,
+                selectedOptionIndex = null,
+                showAnswer = false,
+                isQuizFinished = false,
+                streakCount = 0,
+                correctCount = 0,
+                skippedCount = 0,
+                bestStreak = 0
+            )
         }
     }
 }
