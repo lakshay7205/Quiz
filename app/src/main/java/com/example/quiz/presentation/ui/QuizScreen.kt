@@ -9,13 +9,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.quiz.R
 import com.example.quiz.domain.model.Question
 import com.example.quiz.presentation.ui.components.*
 import com.example.quiz.presentation.viewmodel.QuizUiState
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -48,7 +51,7 @@ fun QuizScreen(
                 when (state) {
                     "loading" -> SplashScreen(modifier = Modifier.fillMaxSize())
                     "error" -> ErrorView(
-                        message = uiState.error ?: "Unknown Error",
+                        message = uiState.error ?: stringResource(R.string.oops),
                         onRetry = onRetry,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -84,24 +87,32 @@ private fun QuizContent(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.quiz_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            )
+            
+            StreakBadge(streakCount = uiState.streakCount)
+        }
+        
         Column(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(horizontal = 24.dp, vertical = 8.dp)
                 .fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ProgressHeader(
-                    currentIndex = uiState.currentQuestionIndex,
-                    totalCount = uiState.questions.size,
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                StreakBadge(streakCount = uiState.streakCount)
-            }
+            ProgressHeader(
+                currentIndex = uiState.currentQuestionIndex,
+                totalCount = uiState.questions.size
+            )
         }
 
         var offsetX by remember { mutableFloatStateOf(0f) }
@@ -137,6 +148,7 @@ private fun QuizContent(
                 question = uiState.questions[index],
                 selectedOptionIndex = uiState.selectedOptionIndex,
                 showAnswer = uiState.showAnswer,
+                streakCount = uiState.streakCount,
                 onOptionSelected = onOptionSelected,
                 onSkip = onSkip
             )
@@ -149,6 +161,7 @@ private fun QuestionCard(
     question: Question,
     selectedOptionIndex: Int?,
     showAnswer: Boolean,
+    streakCount: Int,
     onOptionSelected: (Int) -> Unit,
     onSkip: () -> Unit
 ) {
@@ -171,18 +184,34 @@ private fun QuestionCard(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            question.options.forEachIndexed { index, option ->
-                AnswerOption(
-                    text = option,
-                    isSelected = selectedOptionIndex == index,
-                    isCorrect = index == question.correctOptionIndex,
-                    showAnswer = showAnswer,
-                    enabled = !showAnswer,
-                    onClick = { onOptionSelected(index) }
-                )
+        var itemsVisible by remember(question) { mutableIntStateOf(0) }
+        LaunchedEffect(question) {
+            for (i in 1..question.options.size) {
+                delay(100L)
+                itemsVisible = i
             }
         }
+
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            question.options.forEachIndexed { index, option ->
+                AnimatedVisibility(
+                    visible = itemsVisible > index,
+                    enter = slideInHorizontally { it / 2 } + fadeIn(tween(400)),
+                    exit = fadeOut()
+                ) {
+                    AnswerOption(
+                        text = option,
+                        isSelected = selectedOptionIndex == index,
+                        isCorrect = index == question.correctOptionIndex,
+                        showAnswer = showAnswer,
+                        enabled = !showAnswer,
+                        onClick = { onOptionSelected(index) }
+                    )
+                }
+            }
+        }
+
+        MotivationalMessage(streakCount = streakCount)
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -195,7 +224,7 @@ private fun QuestionCard(
             enabled = !showAnswer
         ) {
             Text(
-                "Skip Question",
+                stringResource(R.string.skip_question),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge
             )

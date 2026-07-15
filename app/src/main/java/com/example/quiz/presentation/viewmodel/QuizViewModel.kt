@@ -3,7 +3,6 @@ package com.example.quiz.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quiz.data.util.ApiResult
-import com.example.quiz.domain.model.Question
 import com.example.quiz.domain.usecase.GetQuestionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.max
+
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val getQuestionsUseCase: GetQuestionsUseCase
@@ -30,10 +30,16 @@ class QuizViewModel @Inject constructor(
 
     fun loadQuestions() {
         viewModelScope.launch {
-            _uiState.value = QuizUiState(isLoading = true)
+            _uiState.update { it.copy(isLoading = true, error = null) }
             when (val result = getQuestionsUseCase()) {
                 is ApiResult.Success -> {
-                    _uiState.update { it.copy(isLoading = false, questions = result.data) }
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false, 
+                            questions = result.data,
+                            error = null
+                        ) 
+                    }
                 }
                 is ApiResult.Error -> {
                     val errorMessage = when (result) {
@@ -103,7 +109,8 @@ class QuizViewModel @Inject constructor(
                 streakCount = 0,
                 correctCount = 0,
                 skippedCount = 0,
-                bestStreak = 0
+                bestStreak = 0,
+                error = null
             )
         }
     }

@@ -8,9 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.quiz.R
 
 @Composable
 fun ErrorView(
@@ -35,7 +37,7 @@ fun ErrorView(
         Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "Oops!",
+            text = stringResource(R.string.oops),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.onBackground
@@ -63,7 +65,7 @@ fun ErrorView(
                 contentColor = MaterialTheme.colorScheme.onError
             )
         ) {
-            Text("Try Again", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.try_again), fontWeight = FontWeight.Bold)
         }
     }
 }

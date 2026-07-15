@@ -14,13 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.quiz.R
 import com.example.quiz.presentation.ui.components.ResultStatCard
 import com.example.quiz.ui.theme.QuizCorrect
-import com.example.quiz.ui.theme.QuizSecondary
 import kotlinx.coroutines.delay
 
 @Composable
@@ -34,7 +35,6 @@ fun ResultsScreen(
 ) {
     val percentage = if (totalCount > 0) (correctCount.toFloat() / totalCount * 100).toInt() else 0
     
-
     var animatedScore by remember { mutableIntStateOf(0) }
     LaunchedEffect(Unit) {
         delay(300)
@@ -54,13 +54,13 @@ fun ResultsScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Close Results",
+                contentDescription = stringResource(R.string.quiz_results),
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
         Text(
-            text = "Quiz Results",
+            text = stringResource(R.string.quiz_results),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth(),
@@ -69,7 +69,6 @@ fun ResultsScreen(
         )
 
         Spacer(modifier = Modifier.weight(0.1f))
-
 
         Box(
             modifier = Modifier
@@ -87,7 +86,7 @@ fun ResultsScreen(
             CircularProgressIndicator(
                 progress = { animatedScore / 100f },
                 modifier = Modifier.fillMaxSize(),
-                color = if (percentage >= 70) QuizCorrect else QuizSecondary,
+                color = if (percentage >= 70) QuizCorrect else MaterialTheme.colorScheme.secondary,
                 strokeWidth = 12.dp,
                 strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
             )
@@ -99,7 +98,7 @@ fun ResultsScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "SCORE",
+                    text = stringResource(R.string.score_label),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     letterSpacing = 2.sp
@@ -111,10 +110,10 @@ fun ResultsScreen(
 
         Text(
             text = when {
-                percentage >= 90 -> "Outstanding!"
-                percentage >= 70 -> "Great Job!"
-                percentage >= 50 -> "Well Done!"
-                else -> "Keep Practicing!"
+                percentage >= 90 -> stringResource(R.string.performance_outstanding)
+                percentage >= 70 -> stringResource(R.string.performance_great)
+                percentage >= 50 -> stringResource(R.string.performance_well)
+                else -> stringResource(R.string.performance_keep_practicing)
             },
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.ExtraBold,
@@ -125,41 +124,57 @@ fun ResultsScreen(
 
         Spacer(modifier = Modifier.weight(0.1f))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        val statsVisible = remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            delay(500)
+            statsVisible.value = true
+        }
+
+        AnimatedVisibility(
+            visible = statsVisible.value,
+            enter = slideInVertically { it / 2 } + fadeIn(tween(600))
         ) {
-            ResultStatCard(
-                label = "Correct",
-                value = "$correctCount/$totalCount",
-                icon = Icons.Default.CheckCircle,
-                iconColor = QuizCorrect,
-                modifier = Modifier.weight(1f)
-            )
-            ResultStatCard(
-                label = "Best Streak",
-                value = "🔥 $bestStreak",
-                icon = Icons.Default.LocalFireDepartment,
-                iconColor = QuizSecondary,
-                modifier = Modifier.weight(1f)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ResultStatCard(
+                    label = stringResource(R.string.correct_answers),
+                    value = "$correctCount/$totalCount",
+                    icon = Icons.Default.CheckCircle,
+                    iconColor = QuizCorrect,
+                    modifier = Modifier.weight(1f)
+                )
+                ResultStatCard(
+                    label = stringResource(R.string.best_streak),
+                    value = "🔥 $bestStreak",
+                    icon = Icons.Default.LocalFireDepartment,
+                    iconColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surface
+        AnimatedVisibility(
+            visible = statsVisible.value,
+            enter = slideInVertically { it / 2 } + fadeIn(tween(600, delayMillis = 200))
         ) {
-            Row(
-                modifier = Modifier.padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface
             ) {
-                Icon(Icons.Default.SkipNext, null, tint = Color.Gray)
-                Spacer(modifier = Modifier.width(12.dp))
-                Text("Skipped Questions", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                Text(skippedCount.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.SkipNext, null, tint = Color.Gray)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(stringResource(R.string.skipped_questions), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                    Text(skippedCount.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                }
             }
         }
 
@@ -176,7 +191,7 @@ fun ResultsScreen(
             ),
             shape = RoundedCornerShape(24.dp)
         ) {
-            Text("Restart Quiz", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+            Text(stringResource(R.string.restart_quiz), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
         }
         Spacer(modifier = Modifier.height(24.dp))
     }

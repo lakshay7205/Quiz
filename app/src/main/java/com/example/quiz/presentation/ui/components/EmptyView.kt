@@ -8,9 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.quiz.R
 
 @Composable
 fun EmptyView(
@@ -34,7 +36,7 @@ fun EmptyView(
         Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "No Questions Found",
+            text = stringResource(R.string.no_questions_found),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
@@ -43,7 +45,7 @@ fun EmptyView(
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "We couldn't find any quiz questions at the moment. Please try again later.",
+            text = stringResource(R.string.no_questions_desc),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge
@@ -62,7 +64,7 @@ fun EmptyView(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Refresh", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.refresh), fontWeight = FontWeight.Bold)
         }
     }
 }
