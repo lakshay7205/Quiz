@@ -2,6 +2,28 @@
 
 A modern, high-performance Quiz application built with **Clean Architecture**, **MVVM**, and **Jetpack Compose Material 3**. This project demonstrates a production-quality approach to building engaging, resilient, and accessible mobile experiences.
 
+## 📸 Visual Preview
+
+### [Watch the Demo Video](https://drive.google.com/file/d/1XD8aQozqg4h1qO1ytfdlkZlGU6ghwdh0/view?usp=sharing)
+
+## Screenshots
+
+### Home & Streak Screen
+
+![Home](media/images/streak.png)
+
+### Answer Selection
+
+![Answer](media/images/answer.png)
+
+### Result Screen
+
+![Result](media/images/result.png)
+
+### Error State
+
+![Error](media/images/error.png)
+
 ## 🚀 Key Features & Implementation Details
 
 ### 1. Functionality & Technical Core
