@@ -4,6 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -168,7 +170,8 @@ private fun QuestionCard(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(24.dp))
@@ -213,7 +216,7 @@ private fun QuestionCard(
 
         MotivationalMessage(streakCount = streakCount)
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(32.dp))
 
         TextButton(
             onClick = onSkip,

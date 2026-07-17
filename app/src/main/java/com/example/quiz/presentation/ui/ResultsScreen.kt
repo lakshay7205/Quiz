@@ -3,7 +3,9 @@ package com.example.quiz.presentation.ui
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -46,6 +48,7 @@ fun ResultsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp)
     ) {
         IconButton(
@@ -68,7 +71,7 @@ fun ResultsScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.weight(0.1f))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Box(
             modifier = Modifier
@@ -122,7 +125,7 @@ fun ResultsScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.weight(0.1f))
+        Spacer(modifier = Modifier.height(32.dp))
 
         val statsVisible = remember { mutableStateOf(false) }
         LaunchedEffect(Unit) {
@@ -178,7 +181,7 @@ fun ResultsScreen(
             }
         }
 
-        Spacer(modifier = Modifier.weight(0.2f))
+        Spacer(modifier = Modifier.height(48.dp))
 
         Button(
             onClick = onRestart,
